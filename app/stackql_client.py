@@ -1,4 +1,4 @@
-"""SELECT-only StackQL client. Never issues mutating statements."""
+"""Read-only StackQL client. SELECT and SHOW only; never mutating statements."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from pystackql import StackQL
 logger = logging.getLogger("sumo_tf.explorer")
 
 VALID_REGIONS = {"au", "ca", "ch", "de", "eu", "fed", "in", "jp", "kr", "us1", "us2"}
-SAFE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
+SAFE_ID = re.compile(r"^[A-Za-z0-9._:+=@|\\-]{1,256}$")
 WRITE_SQL = re.compile(
     r"\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|REPLACE|TRUNCATE|MERGE|GRANT|REVOKE)\b",
     re.IGNORECASE,
@@ -42,10 +42,11 @@ def sanitize_id(value: str) -> str:
     return value
 
 
-def assert_select(query: str) -> None:
+def assert_read(query: str) -> None:
     stripped = query.strip()
-    if not stripped.upper().startswith("SELECT"):
-        raise ValueError("Only SELECT queries are allowed")
+    upper = stripped.upper()
+    if not (upper.startswith("SELECT") or upper.startswith("SHOW ") or upper.startswith("DESCRIBE ")):
+        raise ValueError("Only SELECT, SHOW, and DESCRIBE queries are allowed")
     if WRITE_SQL.search(stripped):
         raise ValueError("Refusing a query that contains a write keyword")
 
@@ -79,13 +80,14 @@ class ReadOnlyStackQL:
         return self._client
 
     def execute(self, query: str) -> list[dict[str, Any]]:
-        assert_select(query)
-        require_credentials()
+        assert_read(query)
+        if query.strip().upper().startswith("SELECT"):
+            require_credentials()
         with self._lock:
             cached = self._cache.get(query)
             if cached is not None:
                 return cached
-            logger.info("StackQL SELECT: %s", query)
+            logger.info("StackQL: %s", query)
             raw: Any = self._stackql().execute(query)
             rows = _normalize_rows(raw)
             self._cache[query] = rows

@@ -85,6 +85,11 @@ nav {
   padding: 0 0.6rem 1.4rem;
 }
 
+details.service.hit > summary,
+details.kind.hit > summary {
+  color: #fff7ea;
+}
+
 details {
   margin: 0.15rem 0;
 }
@@ -132,6 +137,10 @@ details[open] > summary::before {
   cursor: pointer;
 }
 
+.leaf[hidden] {
+  display: none;
+}
+
 .leaf:hover,
 summary:hover {
   background: #2a3026;
@@ -140,6 +149,16 @@ summary:hover {
 .leaf.active {
   background: #3a2a1f;
   color: #fff;
+}
+
+.leaf.hit {
+  background: #3d2e18;
+  color: #fff7ea;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.leaf.hit.active {
+  background: #4a3218;
 }
 
 .muted {

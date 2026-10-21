@@ -9,7 +9,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.catalog import KINDS, get_object, list_kind, nav_payload
+from app.catalog import all_kinds, clear_schema, get_object, list_kind, nav_payload
 from app.stackql_client import client, region
 
 logging.basicConfig(
@@ -34,12 +34,14 @@ def nav() -> dict:
         return nav_payload()
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
 
 
 @app.get("/api/kinds/{kind_id}")
 def kind_list(kind_id: str) -> dict:
-    if kind_id not in KINDS:
-        raise HTTPException(status_code=404, detail="Unknown resource kind")
+    if kind_id not in all_kinds():
+        raise HTTPException(status_code=404, detail="Unknown resource")
     try:
         return list_kind(kind_id)
     except ValueError as exc:
@@ -48,12 +50,12 @@ def kind_list(kind_id: str) -> dict:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
 
-@app.get("/api/kinds/{kind_id}/objects/{object_id}")
-def kind_object(kind_id: str, object_id: str) -> dict:
-    if kind_id not in KINDS:
-        raise HTTPException(status_code=404, detail="Unknown resource kind")
+@app.get("/api/kinds/{kind_id}/object")
+def kind_object(kind_id: str, id: str) -> dict:
+    if kind_id not in all_kinds():
+        raise HTTPException(status_code=404, detail="Unknown resource")
     try:
-        return get_object(kind_id, object_id)
+        return get_object(kind_id, id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
@@ -65,4 +67,5 @@ def kind_object(kind_id: str, object_id: str) -> dict:
 @app.post("/api/refresh")
 def refresh() -> dict:
     client.clear()
+    clear_schema()
     return {"ok": True, "region": region()}
