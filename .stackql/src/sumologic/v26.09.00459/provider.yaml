@@ -1,0 +1,460 @@
+id: sumologic
+name: sumologic
+version: v26.09.00459
+providerServices:
+  access_keys:
+    id: access_keys:v26.09.00459
+    name: access_keys
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/access_keys.yaml
+    title: Sumo Logic Access Keys API
+    version: v26.09.00459
+    description: Access keys of the calling user and of the organization, their scopes, CORS headers and secret rotation.
+  account:
+    id: account:v26.09.00459
+    name: account
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/account.yaml
+    title: Sumo Logic Account API
+    version: v26.09.00459
+    description: Account status, owner, subdomain, plan update requests, usage reports and usage forecasts.
+  apps:
+    id: apps:v26.09.00459
+    name: apps
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/apps.yaml
+    title: Sumo Logic Apps API
+    version: v26.09.00459
+    description: The Sumo Logic app catalog (v1 and v2) - browse, install, upgrade, uninstall apps and follow the asynchronous install jobs.
+  archive:
+    id: archive:v26.09.00459
+    name: archive
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/archive.yaml
+    title: Sumo Logic Archive API
+    version: v26.09.00459
+    description: Archive ingestion jobs that replay archived logs from an AWS S3 archive source.
+  budgets:
+    id: budgets:v26.09.00459
+    name: budgets
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/budgets.yaml
+    title: Sumo Logic Budgets API
+    version: v26.09.00459
+    description: Data volume and search cost budgets and their usage.
+  collectors:
+    id: collectors:v26.09.00459
+    name: collectors
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/collectors.yaml
+    title: Sumo Logic Collectors API
+    version: v26.09.00459
+    description: Collectors, Sources and Collector upgrades (the Collector Management API).
+  connections:
+    id: connections:v26.09.00459
+    name: connections
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/connections.yaml
+    title: Sumo Logic Connections API
+    version: v26.09.00459
+    description: Webhook, ServiceNow, PagerDuty and other outbound connections used by monitors and scheduled searches.
+  content:
+    id: content:v26.09.00459
+    name: content
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/content.yaml
+    title: Sumo Logic Content API
+    version: v26.09.00459
+    description: The content library - folders (personal, global, admin recommended, installed apps), content permissions, paths, and the asynchronous export, import, copy, move and delete jobs.
+  content_sync:
+    id: content_sync:v26.09.00459
+    name: content_sync
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/content_sync.yaml
+    title: Sumo Logic Content Sync API
+    version: v26.09.00459
+    description: Multi-account content synchronisation jobs between child organizations.
+  dashboards:
+    id: dashboards:v26.09.00459
+    name: dashboards
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/dashboards.yaml
+    title: Sumo Logic Dashboards API
+    version: v26.09.00459
+    description: Dashboards (New), dashboard report schedules, report generation jobs and legacy report migration.
+  data_archiving:
+    id: data_archiving:v26.09.00459
+    name: data_archiving
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/data_archiving.yaml
+    title: Sumo Logic Data Archiving API
+    version: v26.09.00459
+    description: Data archiving destinations (AWS S3 buckets for archived logs).
+  data_deletion_rules:
+    id: data_deletion_rules:v26.09.00459
+    name: data_deletion_rules
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/data_deletion_rules.yaml
+    title: Sumo Logic Data Deletion Rules API
+    version: v26.09.00459
+    description: Data deletion rules that remove already-ingested log data.
+  data_masking_rules:
+    id: data_masking_rules:v26.09.00459
+    name: data_masking_rules
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/data_masking_rules.yaml
+    title: Sumo Logic Data Masking Rules API
+    version: v26.09.00459
+    description: Data masking rules applied at ingest.
+  dynamic_parsing_rules:
+    id: dynamic_parsing_rules:v26.09.00459
+    name: dynamic_parsing_rules
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/dynamic_parsing_rules.yaml
+    title: Sumo Logic Dynamic Parsing Rules API
+    version: v26.09.00459
+    description: Dynamic parsing rules that extract fields automatically from JSON logs.
+  event_extraction_rules:
+    id: event_extraction_rules:v26.09.00459
+    name: event_extraction_rules
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/event_extraction_rules.yaml
+    title: Sumo Logic Event Extraction Rules API
+    version: v26.09.00459
+    description: Event extraction rules (Event Analytics) and their quota.
+  extraction_rules:
+    id: extraction_rules:v26.09.00459
+    name: extraction_rules
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/extraction_rules.yaml
+    title: Sumo Logic Extraction Rules API
+    version: v26.09.00459
+    description: Field extraction rules and their quota.
+  feature_settings:
+    id: feature_settings:v26.09.00459
+    name: feature_settings
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/feature_settings.yaml
+    title: Sumo Logic Feature Settings API
+    version: v26.09.00459
+    description: Organization feature settings.
+  fields:
+    id: fields:v26.09.00459
+    name: fields
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/fields.yaml
+    title: Sumo Logic Fields API
+    version: v26.09.00459
+    description: Custom fields, built-in fields, dropped fields and the field quota.
+  health_events:
+    id: health_events:v26.09.00459
+    name: health_events
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/health_events.yaml
+    title: Sumo Logic Health Events API
+    version: v26.09.00459
+    description: Health events for collectors, sources, ingest budgets and other resources.
+  ingest_budgets:
+    id: ingest_budgets:v26.09.00459
+    name: ingest_budgets
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/ingest_budgets.yaml
+    title: Sumo Logic Ingest Budgets API
+    version: v26.09.00459
+    description: Ingest budgets (v2) and their usage reset.
+  log_searches:
+    id: log_searches:v26.09.00459
+    name: log_searches
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/log_searches.yaml
+    title: Sumo Logic Log Searches API
+    version: v26.09.00459
+    description: Saved and scheduled log searches, and estimated usage of a log search across data tiers.
+  logs_data_forwarding:
+    id: logs_data_forwarding:v26.09.00459
+    name: logs_data_forwarding
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/logs_data_forwarding.yaml
+    title: Sumo Logic Logs Data Forwarding API
+    version: v26.09.00459
+    description: Log data forwarding destinations (AWS S3) and forwarding rules per partition.
+  lookup_tables:
+    id: lookup_tables:v26.09.00459
+    name: lookup_tables
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/lookup_tables.yaml
+    title: Sumo Logic Lookup Tables API
+    version: v26.09.00459
+    description: Lookup tables, their rows, file uploads and the asynchronous lookup jobs.
+  macros:
+    id: macros:v26.09.00459
+    name: macros
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/macros.yaml
+    title: Sumo Logic Macros API
+    version: v26.09.00459
+    description: Search macros.
+  metrics_queries:
+    id: metrics_queries:v26.09.00459
+    name: metrics_queries
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/metrics_queries.yaml
+    title: Sumo Logic Metrics Queries API
+    version: v26.09.00459
+    description: Ad hoc metrics queries.
+  metrics_searches:
+    id: metrics_searches:v26.09.00459
+    name: metrics_searches
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/metrics_searches.yaml
+    title: Sumo Logic Metrics Searches API
+    version: v26.09.00459
+    description: Saved metrics searches (v1 and v2).
+  monitors:
+    id: monitors:v26.09.00459
+    name: monitors
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/monitors.yaml
+    title: Sumo Logic Monitors API
+    version: v26.09.00459
+    description: Monitors and monitor folders in the monitors library - search, path, copy, move, import, export, permissions, playbooks and usage.
+  muting_schedules:
+    id: muting_schedules:v26.09.00459
+    name: muting_schedules
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/muting_schedules.yaml
+    title: Sumo Logic Muting Schedules API
+    version: v26.09.00459
+    description: Muting schedules in the muting schedules library.
+  oauth:
+    id: oauth:v26.09.00459
+    name: oauth
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/oauth.yaml
+    title: Sumo Logic Oauth API
+    version: v26.09.00459
+    description: OAuth clients, consents and scopes.
+  organizations:
+    id: organizations:v26.09.00459
+    name: organizations
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/organizations.yaml
+    title: Sumo Logic Organizations API
+    version: v26.09.00459
+    description: Usage of child organizations (multi-account management).
+  ot_collectors:
+    id: ot_collectors:v26.09.00459
+    name: ot_collectors
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/ot_collectors.yaml
+    title: Sumo Logic Ot Collectors API
+    version: v26.09.00459
+    description: OpenTelemetry collectors.
+  parsers:
+    id: parsers:v26.09.00459
+    name: parsers
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/parsers.yaml
+    title: Sumo Logic Parsers API
+    version: v26.09.00459
+    description: Custom and system parsers in the parsers library.
+  partitions:
+    id: partitions:v26.09.00459
+    name: partitions
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/partitions.yaml
+    title: Sumo Logic Partitions API
+    version: v26.09.00459
+    description: Partitions (indexes), their retention and decommissioning, and the partition quota.
+  password_policy:
+    id: password_policy:v26.09.00459
+    name: password_policy
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/password_policy.yaml
+    title: Sumo Logic Password Policy API
+    version: v26.09.00459
+    description: The organization password policy.
+  policies:
+    id: policies:v26.09.00459
+    name: policies
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/policies.yaml
+    title: Sumo Logic Policies API
+    version: v26.09.00459
+    description: Organization security and behaviour policies - audit, search audit, data access level, data deletion, session limits, dashboard sharing, timestamp format, OAuth CIMD and access key lifetime.
+  roles:
+    id: roles:v26.09.00459
+    name: roles
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/roles.yaml
+    title: Sumo Logic Roles API
+    version: v26.09.00459
+    description: Roles (v1 and v2) and role assignment to users.
+  saml:
+    id: saml:v26.09.00459
+    name: saml
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/saml.yaml
+    title: Sumo Logic Saml API
+    version: v26.09.00459
+    description: SAML identity providers, allowlisted users and SAML lockdown.
+  scheduled_views:
+    id: scheduled_views:v26.09.00459
+    name: scheduled_views
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/scheduled_views.yaml
+    title: Sumo Logic Scheduled Views API
+    version: v26.09.00459
+    description: Scheduled views and their quota.
+  schemas:
+    id: schemas:v26.09.00459
+    name: schemas
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/schemas.yaml
+    title: Sumo Logic Schemas API
+    version: v26.09.00459
+    description: Schema identities grouped by product (Schema Base Management).
+  scim:
+    id: scim:v26.09.00459
+    name: scim
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/scim.yaml
+    title: Sumo Logic Scim API
+    version: v26.09.00459
+    description: SCIM 2.0 user provisioning.
+  search_jobs:
+    id: search_jobs:v26.09.00459
+    name: search_jobs
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/search_jobs.yaml
+    title: Sumo Logic Search Jobs API
+    version: v26.09.00459
+    description: Search jobs (v2) - create a log search job, poll its status and page through its messages and records.
+  service_accounts:
+    id: service_accounts:v26.09.00459
+    name: service_accounts
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/service_accounts.yaml
+    title: Sumo Logic Service Accounts API
+    version: v26.09.00459
+    description: Service accounts and their access keys.
+  service_allowlist:
+    id: service_allowlist:v26.09.00459
+    name: service_allowlist
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/service_allowlist.yaml
+    title: Sumo Logic Service Allowlist API
+    version: v26.09.00459
+    description: The service allowlist of CIDR addresses for login and content access.
+  slos:
+    id: slos:v26.09.00459
+    name: slos
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/slos.yaml
+    title: Sumo Logic Slos API
+    version: v26.09.00459
+    description: SLOs and SLO folders in the SLO library, service level indicators and usage.
+  source_templates:
+    id: source_templates:v26.09.00459
+    name: source_templates
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/source_templates.yaml
+    title: Sumo Logic Source Templates API
+    version: v26.09.00459
+    description: Source templates for OpenTelemetry collectors (v1 deprecated and v2).
+  threat_intel:
+    id: threat_intel:v26.09.00459
+    name: threat_intel
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/threat_intel.yaml
+    title: Sumo Logic Threat Intel API
+    version: v26.09.00459
+    description: Threat intelligence datastore, data sources, retention and indicator ingestion.
+  tokens:
+    id: tokens:v26.09.00459
+    name: tokens
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/tokens.yaml
+    title: Sumo Logic Tokens API
+    version: v26.09.00459
+    description: Installation tokens (tokens library).
+  tracing:
+    id: tracing:v26.09.00459
+    name: tracing
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/tracing.yaml
+    title: Sumo Logic Tracing API
+    version: v26.09.00459
+    description: Traces, spans, trace and span queries, tracing metrics and the service map.
+  transformation_rules:
+    id: transformation_rules:v26.09.00459
+    name: transformation_rules
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/transformation_rules.yaml
+    title: Sumo Logic Transformation Rules API
+    version: v26.09.00459
+    description: Metrics transformation rules.
+  users:
+    id: users:v26.09.00459
+    name: users
+    preferred: true
+    service:
+      $ref: sumologic/v26.09.00459/services/users.yaml
+    title: Sumo Logic Users API
+    version: v26.09.00459
+    description: Users and their lifecycle actions - unlock, password reset, email change, welcome email, MFA.
+config:
+  auth:
+    type: basic
+    username_var: SUMOLOGIC_ACCESSID
+    password_var: SUMOLOGIC_ACCESSKEY
+  snake_case_aliases: true

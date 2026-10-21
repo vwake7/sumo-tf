@@ -1,0 +1,23 @@
+services:
+  web:
+    # PyStackQL's bundled StackQL installer currently requires Linux amd64.
+    # Docker Desktop runs this on Apple Silicon through its amd64 emulation.
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - path: .env
+        required: false
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    ports:
+      - "8000:8000"
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
