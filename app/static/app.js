@@ -46,7 +46,8 @@ function renderNav(nav) {
       kindEl.dataset.kind = kind.id;
       kindEl.dataset.label = `${kind.id} ${kind.label}`.toLowerCase();
       const summary = document.createElement("summary");
-      summary.textContent = kind.label;
+      summary.textContent =
+        kind.count == null ? kind.label : `${kind.label} (${kind.count})`;
       const body = document.createElement("div");
       body.className = "kind-body";
       body.innerHTML = '<p class="muted">Expand to load</p>';
@@ -99,12 +100,18 @@ async function selectObject(kindId, item, button, listData) {
   activeButton = button;
   button.classList.add("active");
   kindLabel.textContent = listData.label;
+  if (item.object) {
+    const origin = item.source === "get" ? "GET" : "list";
+    setStatus(item.label, `${origin}: ${item.query || listData.query}`, JSON.stringify(item.object, null, 2));
+    return;
+  }
   setStatus(item.label, listData.query, "Loading JSON…");
   try {
     const data = await api(
       `/api/kinds/${encodeURIComponent(kindId)}/object?id=${encodeURIComponent(item.id)}`
     );
-    setStatus(data.label, data.query, JSON.stringify(data.object, null, 2));
+    const origin = data.source === "get" ? "GET" : "list";
+    setStatus(data.label, `${origin}: ${data.query}`, JSON.stringify(data.object, null, 2));
   } catch (error) {
     setStatus(item.label, listData.query, error.message, true);
   }
@@ -179,7 +186,8 @@ async function boot() {
   try {
     const nav = await api("/api/nav");
     const kinds = nav.groups.reduce((n, group) => n + group.kinds.length, 0);
-    regionEl.textContent = `${nav.region} · ${nav.groups.length} services · ${kinds} resources`;
+    const ready = nav.preloaded ? "preloaded" : "live";
+    regionEl.textContent = `${nav.region} · ${nav.groups.length} services · ${kinds} resources · ${ready}`;
     renderNav(nav);
   } catch (error) {
     regionEl.textContent = "unavailable";

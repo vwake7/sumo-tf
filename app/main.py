@@ -3,13 +3,21 @@
 from __future__ import annotations
 
 import logging
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.catalog import all_kinds, clear_schema, get_object, list_kind, nav_payload
+from app.catalog import (
+    all_kinds,
+    clear_schema,
+    get_object,
+    list_kind,
+    nav_payload,
+    preload,
+)
 from app.stackql_client import client, region
 
 logging.basicConfig(
@@ -18,7 +26,13 @@ logging.basicConfig(
     datefmt="%Y-%m-%dT%H:%M:%S",
 )
 
-app = FastAPI(title="Sumo explorer", docs_url=None, redoc_url=None)
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    preload()
+    yield
+
+
+app = FastAPI(title="Sumo explorer", docs_url=None, redoc_url=None, lifespan=lifespan)
 STATIC = Path(__file__).parent / "static"
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
@@ -68,4 +82,5 @@ def kind_object(kind_id: str, id: str) -> dict:
 def refresh() -> dict:
     client.clear()
     clear_schema()
-    return {"ok": True, "region": region()}
+    preload(resume=False)
+    return {"ok": True, "region": region(), "preloaded": True}
