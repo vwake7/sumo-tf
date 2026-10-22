@@ -196,9 +196,28 @@ async function boot() {
 }
 
 refreshBtn.addEventListener("click", async () => {
+  refreshBtn.disabled = true;
+  refreshBtn.textContent = "Refreshing from Sumo…";
   loaded.clear();
-  await api("/api/refresh", { method: "POST" });
-  await boot();
+  setStatus(
+    "Refreshing from Sumo",
+    "",
+    "Listing every resource and GET-by-id from the live Sumo account. This can take several minutes."
+  );
+  try {
+    await api("/api/refresh", { method: "POST" });
+    await boot();
+    setStatus(
+      "Account refreshed",
+      "",
+      "Resources were reloaded from the Sumo account. Select a resource in the left nav."
+    );
+  } catch (error) {
+    setStatus("Refresh failed", "", error.message, true);
+  } finally {
+    refreshBtn.disabled = false;
+    refreshBtn.textContent = "Refresh from Sumo";
+  }
 });
 
 filter.addEventListener("input", scheduleSearch);

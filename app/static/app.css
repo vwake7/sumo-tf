@@ -182,13 +182,30 @@ main {
 }
 
 button#refresh {
-  border: 1px solid #d3cbb8;
-  background: #fffdf8;
-  color: var(--ink);
-  border-radius: 6px;
-  padding: 0.45rem 0.8rem;
+  display: block;
+  width: 100%;
+  margin: 0 0 0.85rem;
+  border: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--accent);
+  color: #fffdf8;
+  border-radius: 8px;
+  padding: 0.75rem 0.9rem;
   font: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
   cursor: pointer;
+}
+
+button#refresh:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+button#refresh:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 .query {
