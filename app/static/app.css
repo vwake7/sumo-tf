@@ -260,6 +260,11 @@ button#generate:disabled {
   cursor: wait;
 }
 
+button#clear-selection:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
 button#generate {
   display: block;
   width: 100%;
@@ -280,6 +285,28 @@ button#generate {
 
 button#generate:hover:not(:disabled) {
   background: #2a241c;
+}
+
+button#clear-selection {
+  display: block;
+  width: 100%;
+  margin: 0 0 0.55rem;
+  border: 1px solid var(--line);
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  font: inherit;
+  font-weight: 500;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+button#clear-selection:hover:not(:disabled) {
+  color: #fffdf8;
+  border-color: #8b9084;
 }
 
 .select-meta {

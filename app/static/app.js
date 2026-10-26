@@ -7,6 +7,7 @@ const kindLabel = document.getElementById("kind-label");
 const regionEl = document.getElementById("region");
 const refreshBtn = document.getElementById("refresh");
 const generateBtn = document.getElementById("generate");
+const clearBtn = document.getElementById("clear-selection");
 const selectCountEl = document.getElementById("select-count");
 
 const MIN_SEARCH = 3;
@@ -83,6 +84,17 @@ function paintSelection() {
   } else {
     selectCountEl.textContent = `0 of ${totalAll} selected`;
   }
+  clearBtn.disabled = selectedAll === 0;
+}
+
+function clearSelection() {
+  selectedKinds.clear();
+  selectedObjects.clear();
+  for (const box of tree.querySelectorAll('input[type="checkbox"]')) {
+    box.checked = false;
+    box.indeterminate = false;
+  }
+  paintSelection();
 }
 
 function stopPick(event) {
@@ -400,6 +412,8 @@ generateBtn.addEventListener("click", async () => {
     generateBtn.textContent = "Generate Terraform";
   }
 });
+
+clearBtn.addEventListener("click", clearSelection);
 
 filter.addEventListener("input", scheduleSearch);
 filter.addEventListener("search", scheduleSearch);

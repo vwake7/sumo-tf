@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="/static/app.css?v=counts" />
+    <link rel="stylesheet" href="/static/app.css?v=clear" />
   </head>
   <body>
     <aside>
@@ -20,7 +20,8 @@
         <p class="meta" id="region">loading…</p>
         <button type="button" id="refresh">Refresh from Sumo</button>
         <button type="button" id="generate">Generate Terraform</button>
-        <p class="meta select-meta" id="select-count">No resources selected</p>
+        <button type="button" id="clear-selection">Clear selection</button>
+        <p class="meta select-meta" id="select-count">0 selected</p>
         <input id="filter" type="search" placeholder="Search services or resources" autocomplete="off" />
       </header>
       <nav id="tree"></nav>
@@ -35,6 +36,6 @@
       <p class="query" id="query"></p>
       <pre id="json">Check resources in the left nav, then generate Terraform. Properties appear here as JSON after you click a resource.</pre>
     </main>
-    <script src="/static/app.js?v=counts"></script>
+    <script src="/static/app.js?v=clear"></script>
   </body>
 </html>
