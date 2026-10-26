@@ -1,71 +1,43 @@
-# Sumo Logic Terraform Import Generator
+# Sumo explorer
 
-## Local Docker development environment
+Browse a live Sumo Logic account and turn selected resources into Terraform.
 
-This project runs Python, PyStackQL, and Terraform inside Docker. It does not require Python, StackQL, or Terraform to be installed on macOS. Docker Desktop is required.
+The app reads the account with StackQL (list + GET), shows every service and resource in a left nav, and writes HCL from the saved snapshot plus the official Sumo Terraform provider schema. It never runs `terraform apply`. Use a read-only access key when you can.
 
-The image pins Python 3.12, PyStackQL 3.8.1, and Terraform 1.16.5. PyStackQL's bundled StackQL installer currently requires Linux amd64, so Compose uses amd64 emulation on Apple Silicon Macs. The project directory is mounted at `/workspace`, so source files and generated artifacts remain on the Mac. Terraform's provider plugin cache is kept in a named Docker volume.
+## Get started
 
-There is a single Compose service, `web`. It serves a read-only explorer at http://localhost:8000. The app lists Sumo resources in a left nav and shows StackQL `SELECT` results as JSON. It never issues write queries or runs `terraform apply`.
+**1. Install Docker Desktop** and start it.
+
+**2. Copy credentials**
+
+```sh
+cp .env.example .env
+```
+
+Fill in `SUMOLOGIC_ACCESSID`, `SUMOLOGIC_ACCESSKEY`, and `SUMOLOGIC_ENVIRONMENT` (`us1`, `us2`, `eu`, `au`, `in`, or `jp`). `.env` is gitignored.
+
+**3. Start the explorer**
 
 ```sh
 docker compose up --build
 ```
 
-Build the image and check the tools:
+On Apple Silicon this runs Linux amd64 through Docker’s emulator (required by StackQL).
 
-```sh
-docker compose build
-docker compose run --rm --no-deps web python -c 'from pystackql import StackQL; print("PyStackQL", StackQL().version)'
-docker compose run --rm --no-deps web terraform version
-```
+**4. Open** [http://localhost:8000](http://localhost:8000)
 
-Open a shell in the environment:
+On first start the app loads `inventory/explorer_snapshot.json` if that file exists. If it does not, it walks every StackQL resource against Sumo. That can take a long time. Progress is in `docker compose logs -f web`. After a full pass, the snapshot is reused on the next start.
 
-```sh
-docker compose run --rm --no-deps --entrypoint bash web
-```
+**5. Explore**
 
-Run the saved OpenTelemetry collector inventory query and write a timestamped JSON snapshot under the Git-ignored `inventory/` directory:
+- Expand a service, then a resource, then click an object to see its GET JSON.
+- Search needs at least three characters.
+- **Refresh from Sumo** re-fetches the whole account and overwrites the snapshot.
 
-```sh
-docker compose run --rm --no-deps web python scripts/list_ot_collectors.py
-```
+**6. Generate Terraform**
 
-The snapshot includes the full selected collector fields, so treat it as potentially sensitive account data. Choose another path with `--output` if needed.
+- Check a resource type (all objects) or individual objects.
+- Generate also includes upstream and downstream IDs found in that JSON (for example folders a dashboard lives in).
+- Click **Generate Terraform**. Files go to `generated/tf/` (gitignored), with `imports.tf` for brownfield import.
 
-Fetch classic collectors with the StackQL query used by the running collector service:
-
-```sh
-docker compose run --rm --no-deps web python scripts/list_collectors.py --log-level DEBUG
-```
-
-Fetch one user with a timestamped snapshot and INFO logs:
-
-```sh
-docker compose run --rm --no-deps web python scripts/list_one_user.py
-```
-
-User snapshots can contain personal information and are written under the Git-ignored `inventory/` directory.
-
-PyStackQL can be used directly from Python:
-
-```python
-from pystackql import StackQL
-
-stackql = StackQL()  # Output defaults to Python dictionaries.
-result = stackql.execute("SHOW SERVICES IN sumologic")
-print(result)
-```
-
-The StackQL Sumo provider uses Sumo Logic Access ID and Access Key credentials with HTTP Basic auth. Copy `.env.example` to `.env`, fill in `SUMOLOGIC_ACCESSID`, `SUMOLOGIC_ACCESSKEY`, and your `SUMOLOGIC_ENVIRONMENT` deployment (for example, `us1`, `us2`, `eu`, or `in`). Compose passes those variables into the container at runtime, where both PyStackQL and the Sumo Terraform provider can read them. Use a read-only credential for inventory queries where possible. `.env` is excluded from Git and the Docker build context. No account credentials are needed for the image/tool smoke checks above.
-
-Terraform commands run from the same mounted workspace. For example, after adding a provider configuration and initializing it:
-
-```sh
-docker compose run --rm --no-deps web terraform providers schema -json
-```
-
-The generated configuration, inventory, and state may contain sensitive account details. Keep local exports out of Git; `inventory/`, `generated/`, `.env`, state files, and plan files are ignored.
-
-This environment is for development and plan review. It does not run `terraform apply` automatically.
+This repo does not apply Terraform. Review the files, import, then manage them yourself.
