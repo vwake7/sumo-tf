@@ -76,7 +76,8 @@ class ReadOnlyStackQL:
 
     def _stackql(self) -> StackQL:
         if self._client is None:
-            self._client = StackQL()
+            # page_limit default is 20 HTTP pages, which truncates large Sumo lists.
+            self._client = StackQL(page_limit=10000, max_results=-1, api_timeout=120)
         return self._client
 
     def execute(self, query: str) -> list[dict[str, Any]]:

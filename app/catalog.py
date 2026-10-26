@@ -197,6 +197,15 @@ def schema() -> list[dict[str, Any]]:
     return _schema
 
 
+def inventory() -> dict[str, dict[str, Any]]:
+    """Live preload cache, or the on-disk StackQL snapshot if preload is incomplete."""
+    if _inventory is not None:
+        return _inventory
+    snapshot = load_snapshot()
+    saved = snapshot.get("inventory") if snapshot else None
+    return saved if isinstance(saved, dict) else {}
+
+
 def all_kinds() -> dict[str, Kind]:
     return schema()[0]["_kinds"]
 
@@ -260,11 +269,26 @@ def _get_tables(kind: Kind) -> list[str]:
     return tables
 
 
-def _get_queries(kind: Kind, object_id: str) -> list[str]:
+def _get_queries(
+    kind: Kind, object_id: str, list_row: dict[str, Any] | None = None
+) -> list[str]:
     loc = region()
     safe = sanitize_id(object_id)
     queries: list[str] = []
+    parent = ""
+    if list_row:
+        parent = _str(list_row, "collector_id", "collectorId")
+        if parent:
+            try:
+                parent = sanitize_id(parent)
+            except ValueError:
+                parent = ""
     for table in _get_tables(kind):
+        if parent:
+            queries.append(
+                f"SELECT * FROM {table} WHERE region = '{loc}' "
+                f"AND collector_id = '{parent}' AND id = '{safe}'"
+            )
         queries.append(f"SELECT * FROM {table} WHERE region = '{loc}' AND id = '{safe}'")
         queries.append(
             f"SELECT * FROM {table} WHERE region = '{loc}' AND field_id = '{safe}'"
@@ -280,7 +304,7 @@ def fetch_detail(
     object_id = _identity(list_row)
     if not object_id:
         return "", list_row, "list"
-    for query in _get_queries(kind, object_id):
+    for query in _get_queries(kind, object_id, list_row):
         try:
             rows = client.execute(query)
         except (RuntimeError, ValueError):
@@ -290,6 +314,13 @@ def fetch_detail(
     return "", list_row, "list"
 
 
+def _sql_limit(query: str) -> str:
+    stripped = query.rstrip().rstrip(";")
+    if " LIMIT " in stripped.upper():
+        return stripped
+    return f"{stripped} LIMIT 100000"
+
+
 def _queries(kind: Kind) -> list[str]:
     loc = region()
     table = kind.table
@@ -297,6 +328,11 @@ def _queries(kind: Kind) -> list[str]:
         f"SELECT * FROM {table} WHERE region = '{loc}'",
         f"SELECT * FROM {table} WHERE region = '{loc}' AND include_count = false",
     ]
+    if kind.id == "dashboards.dashboards":
+        attempts.insert(
+            0,
+            f"SELECT * FROM {table} WHERE region = '{loc}' AND mode = 'allViewableByUser'",
+        )
     if kind.resource == "search":
         attempts.extend(
             [
@@ -304,10 +340,119 @@ def _queries(kind: Kind) -> list[str]:
                 f"SELECT * FROM {table} WHERE region = '{loc}' AND query = 'type:Monitor'",
             ]
         )
-    return attempts
+    return [_sql_limit(query) for query in attempts]
+
+
+def _parent_ids(parent_kind_id: str) -> list[str]:
+    if parent_kind_id not in all_kinds():
+        return []
+    if _inventory is not None and parent_kind_id in _inventory:
+        return [str(item["id"]) for item in _inventory[parent_kind_id]["items"] if item.get("id")]
+    parent = get_kind(parent_kind_id)
+    _, rows = execute_kind(parent)
+    ids: list[str] = []
+    for row in rows:
+        object_id = row_id(row)
+        if object_id:
+            ids.append(object_id)
+    return ids
+
+
+def _list_sources_for_collectors(kind: Kind) -> tuple[str, list[dict[str, Any]]]:
+    loc = region()
+    collector_ids = _parent_ids("collectors.collectors")
+    rows: list[dict[str, Any]] = []
+    query = (
+        f"SELECT * FROM {kind.table} WHERE region = '{loc}' AND collector_id = <collector> LIMIT 100000"
+    )
+    for collector_id in collector_ids:
+        try:
+            safe = sanitize_id(collector_id)
+        except ValueError:
+            continue
+        page_query = (
+            f"SELECT * FROM {kind.table} WHERE region = '{loc}' "
+            f"AND collector_id = '{safe}' LIMIT 100000"
+        )
+        try:
+            page = client.execute(page_query)
+        except (RuntimeError, ValueError):
+            continue
+        for row in page:
+            if isinstance(row, dict) and not row.get("collector_id"):
+                row["collector_id"] = collector_id
+            rows.append(row)
+        query = page_query
+    logger.info("Listed %s source(s) across %s collector(s)", len(rows), len(collector_ids))
+    return query, rows
+
+
+def _folder_children(row: dict[str, Any]) -> list[dict[str, Any]]:
+    children = row.get("children") or []
+    if isinstance(children, str):
+        try:
+            children = json.loads(children)
+        except json.JSONDecodeError:
+            return []
+    if not isinstance(children, list):
+        return []
+    return [child for child in children if isinstance(child, dict)]
+
+
+def _walk_content_folders(kind: Kind) -> tuple[str, list[dict[str, Any]]]:
+    loc = region()
+    seeds: list[str] = []
+    personal = get_kind("content.personal_folder")
+    try:
+        _, personal_rows = execute_kind(personal)
+    except (RuntimeError, ValueError, KeyError):
+        personal_rows = []
+    for row in personal_rows:
+        object_id = row_id(row)
+        if object_id:
+            seeds.append(object_id)
+        for child in _folder_children(row):
+            child_type = str(child.get("item_type") or child.get("itemType") or "")
+            child_id = row_id(child)
+            if child_type == "Folder" and child_id:
+                seeds.append(child_id)
+    seen: set[str] = set()
+    queue = list(dict.fromkeys(seeds))
+    folders: list[dict[str, Any]] = []
+    query = f"SELECT * FROM {kind.table} WHERE region = '{loc}' AND id = <id>"
+    while queue:
+        folder_id = queue.pop(0)
+        if folder_id in seen:
+            continue
+        try:
+            safe = sanitize_id(folder_id)
+        except ValueError:
+            continue
+        seen.add(folder_id)
+        page_query = f"SELECT * FROM {kind.table} WHERE region = '{loc}' AND id = '{safe}'"
+        try:
+            page = client.execute(page_query)
+        except (RuntimeError, ValueError):
+            continue
+        query = page_query
+        if not page:
+            continue
+        folder = page[0]
+        folders.append(folder)
+        for child in _folder_children(folder):
+            child_type = str(child.get("item_type") or child.get("itemType") or "")
+            child_id = row_id(child)
+            if child_type == "Folder" and child_id and child_id not in seen:
+                queue.append(child_id)
+    logger.info("Walked %s content folder(s)", len(folders))
+    return query, folders
 
 
 def execute_kind(kind: Kind) -> tuple[str, list[dict[str, Any]]]:
+    if kind.id == "collectors.sources":
+        return _list_sources_for_collectors(kind)
+    if kind.id == "content.folders":
+        return _walk_content_folders(kind)
     last_error: Exception | None = None
     empty_query = ""
     for query in _queries(kind):
